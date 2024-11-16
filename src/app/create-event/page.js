@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import EventCard from "@/components/common/eventCard";
