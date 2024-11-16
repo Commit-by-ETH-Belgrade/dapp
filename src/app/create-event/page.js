@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import EventCard from "@/components/common/eventCard";
-import { useWriteContract } from 'wagmi';
+import { useAccount, useWriteContract, useReadContract } from 'wagmi';
 import { PinataSDK } from "pinata";
+import { ethers, toUtf8Bytes } from 'ethers';
 
 import CommitContract from "@/utils/commitContract.json";
+import InputBoxContract from "@/utils/inputBox.json";
 import { parseEther, zeroAddress } from "viem";
 import { useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import { toast } from 'react-toastify';
@@ -17,6 +19,8 @@ const pinata = new PinataSDK({
   pinataGateway: "emerald-mental-chinchilla-134.mypinata.cloud",
   pinataGatewayKey: process.env.NEXT_PUBLIC_PINATA_GATEWAY_KEY
 });
+
+const COMMIT_CONTRACT = '0x5d2Fab79A78213eAD922e036E3a3e4320390330a';
 
 const CreateEvent = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -30,9 +34,20 @@ const CreateEvent = () => {
   const [eventCity, setCity] = useState('');
   const [amount, setAmount] = useState('');
   const [eventDescription, setEventDescription] = useState('');
+  const account = useAccount();
 
+  const eventId = useReadContract({
+    abi: CommitContract.abi,
+    address: COMMIT_CONTRACT,
+    functionName: 'eventId',
+  })
   const { writeContractAsync } = useWriteContract();
 
+  const rpcProviderUrl = 'https://arbitrum-sepolia.gateway.tenderly.co/4YMRN8fKu2SV1JSNsGlbMZ';
+  const privateKey = process.env.NEXT_PUBLIC_DEV_WALLET;
+  const contractAddress = '0x59b22D57D4f067708AB0c00552767405926dc768';
+
+  console.log("EventId", eventId.data);
   const createEvent = async () => {
     try {
       if (creatingEventInProgress) return;
@@ -50,40 +65,65 @@ const CreateEvent = () => {
       console.log('Attempting to create event...');
       const data = await writeContractAsync({
           // TODO: make dynamic
-          address: '0x5d2Fab79A78213eAD922e036E3a3e4320390330a',
+          address: COMMIT_CONTRACT,
           abi: CommitContract.abi,
           functionName: 'createEvent',
           args: [parseEther(amount)], // Ensure these arguments are correct
-      }
-      );
-      console.log('Event created successfully:', data);
+      });
+      console.log('Event created successfully on contract:', data);
+
+      // Cartesi input STARTSs
+      const provider = new ethers.getDefaultProvider(rpcProviderUrl);
+      const wallet = new ethers.Wallet(privateKey, provider);
+      const contract = new ethers.Contract(contractAddress, InputBoxContract.abi, wallet);
+
+      console.log("account", account)
+
+      const payload = {
+        "id": Math.floor(Math.random() * 10000000) + 100,
+        "title": eventName,
+        "description": eventDescription,
+        "image": url,
+        "date_event": eventDate,
+        "start_time": startTime,
+        "end_time": endTime,
+        "location": eventAddress,
+        "address": eventAddress,
+        "city": eventCity,
+        "organiser": account.address,
+        "amount": amount,
+        "guests": "0",
+        "status": "Scheduled",
+        "dummy_1": `${Number(eventId.data) + 1}`,
+        "action": "add"
+      };
+
+      const jsonString = JSON.stringify(payload);
+      const bytesPayload = toUtf8Bytes(jsonString);
+
+      // Call the smart contract function
+      const tx = await contract.addInput('0x61f35052e6d3aB5170cc949193B30Dba81127a95', bytesPayload);
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
+      console.log('Transaction successful:', receipt);
+     // Cartesi ENDS
+
       setCreatingEventInProgress(false);
+      toast.success('Event created successfully');
+      setEventName('');
+      setAmount('');
+      setEventAddress('');
+      setFile(undefined);
+      setCity('');
+      setEventDate('');
+      setStartTime('');
+      setEndTime('');
+      setEventDescription('');
     } catch (error) {
       console.error('Failed to create event:', error);
       setCreatingEventInProgress(false);
       toast.error('Failed to create event');
     }
-    // const event = {
-    //   name: eventName,
-    //   date: eventDate,
-    //   time: eventTime,
-    //   location: eventLocation,
-    //   description: eventDescription
-    // };
-    //
-    // const response = await fetch('http://localhost:3001/events', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify(event)
-    // });
-    //
-    // if (response.ok) {
-    //   alert('Event created successfully');
-    // } else {
-    //   alert('Failed to create event');
-    // }
   };
 
   if (!isLoggedIn) {
