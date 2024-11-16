@@ -7,7 +7,7 @@ import EventCard from "@/components/common/eventCard";
 import { useWriteContract } from 'wagmi';
 import { PinataSDK } from "pinata";
 
-import CommitContract from "@/constants/commitContract.json";
+import CommitContract from "@/utils/commitContract.json";
 import { parseEther, zeroAddress } from "viem";
 import { useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import { toast } from 'react-toastify';

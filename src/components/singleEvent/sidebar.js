@@ -1,15 +1,15 @@
 import EventDetails from "@/components/singleEvent/eventDetails";
 
-const Sidebar = () => {
+const Sidebar = ({date, startTime, endTime, stakingAmount, location, city}) => {
   return (
     <div className="sidebar col-span-2">
       <EventDetails
-        date="Monday, 3 June"
-        timeStarts="18:00"
-        timeEnds="22:00"
-        address="Beogradjanka, Palata Beograd, 3rd floor"
-        city="Belgrade"
-        stakeAmount={0.05}
+        date={date}
+        timeStarts={startTime}
+        timeEnds={endTime}
+        address={location}
+        city={city}
+        stakeAmount={stakingAmount}
       />
     </div>
   );

@@ -18,7 +18,7 @@ const EventDetails = ({stakeAmount, date, timeStarts, timeEnds, address, city}) 
 
       <div className="mb-5">
         <p className="border-b border-white pb-2 mb-5">Registration</p>
-        <p className="text-[--textcolor] text-sm mb-2">Please click on the button below to register. You will be required to stake {stakeAmount} ETH.</p>
+        <p className="text-[--textcolor] text-sm mb-2">Please click on the button below to register. You will be required to stake ${stakeAmount} worth of ETH.</p>
         <p className="text-sm">Learn more about how staking works ↗</p>
         <Button className="w-full mt-4">Commit to attend</Button>
       </div>
