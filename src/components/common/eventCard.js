@@ -1,5 +1,4 @@
 import { Card } from "@/components/ui/card";
-import { classNames } from "@dynamic-labs/sdk-react-core";
 
 const EventCard = ({ image, title, organizer, startTime, endTime, address, city, stakeAmount, className, guests }) => {
   return (
@@ -39,7 +38,7 @@ const EventCard = ({ image, title, organizer, startTime, endTime, address, city,
           <div className="bg-[#222] p-2 mt-4">
             <p className="text-[--textcolor] mb-1">{startTime} {endTime && ` - ${endTime}`}</p>
             <p className="text-[--textcolor] mb-1">{address} {city && `, ${city}`}</p>
-            <p>Stake {stakeAmount} ETH to commit</p>
+            <p>Stake ${stakeAmount} to commit</p>
           </div>
         </div>
       </Card>

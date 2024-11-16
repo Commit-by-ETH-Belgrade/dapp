@@ -1,5 +1,7 @@
 "use client";
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   DynamicContextProvider,
   DynamicWidget,
@@ -11,16 +13,16 @@ import {
 } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http } from 'viem';
-import { mainnet } from 'viem/chains';
+import { mainnet, sepolia, } from 'viem/chains';
 
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { FlowWalletConnectors } from "@dynamic-labs/flow";
 
 const config = createConfig({
-  chains: [mainnet],
+  chains: [sepolia],
   multiInjectedProviderDiscovery: false,
   transports: {
-    [mainnet.id]: http(),
+    [sepolia.id]: http("https://sepolia.gateway.tenderly.co/4qbXc80wWRNPYLf2MaDD7A"),
   },
 });
 
@@ -45,6 +47,11 @@ export default function Providers({children}) {
           <DynamicWagmiConnector>
             {/*<DynamicWidget />*/}
             {children}
+            <ToastContainer
+              theme="dark"
+              position="bottom-right"
+              hideProgressBar="true"
+            />
           </DynamicWagmiConnector>
         </QueryClientProvider>
       </WagmiProvider>
