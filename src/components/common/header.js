@@ -1,7 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 
 const Header = () =>{
+  const isLoggedIn = useIsLoggedIn();
+
   return (
     <div className="flex w-full flex-col">
       <header className="max-w-6xl w-full mx-auto flex items-center justify-between gap-4 bg-background py-8 px-4 md:px-6">
@@ -13,25 +19,26 @@ const Header = () =>{
             href="/"
             className="text-[var(--text-color)] transition-colors hover:text-foreground"
           >
-            Home
-          </Link>
-          <Link
-            href="/recycle"
-            className="transition-colors hover:text-foreground"
-          >
             Events
           </Link>
           <Link
             href="/public-goods"
             className="transition-colors hover:text-foreground"
           >
-            Communities
+            Public goods funding
           </Link>
         </nav>
-        <div className="w-[200px] flex items-center justify-end">
-          <Button size="lg" variant="secondary">
-            Login
-          </Button>
+        <div className="flex items-center justify-end">
+          {
+            isLoggedIn && (
+              <Link href="/create-event">
+                <Button className="mr-2" size="lg" variant="secondary">
+                  Create event
+                </Button>
+              </Link>
+            )
+          }
+          <DynamicWidget />
         </div>
       </header>
     </div>
